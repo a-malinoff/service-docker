@@ -1,0 +1,59 @@
+version: '3'
+services:
+    a:
+        build: ./a
+        restart: unless-stopped
+        dns: 8.8.8.8
+        working_dir: /app
+        volumes:
+            - ~/PhpstormProjects/service-a/:/app:rw
+            - ~/.composer:/home/user/.composer
+        ports:
+            - "0.0.0.0:82:8000"
+        networks:
+            - services
+        command: /bin/bash -c "symfony server:stop && symfony server:start --no-tls"
+        logging:
+            options:
+                max-size: "100k"
+                max-file: "3"
+    b:
+        build: ./b
+        restart: unless-stopped
+        dns: 8.8.8.8
+        working_dir: /app
+        volumes:
+            - ~/PhpstormProjects/service-b/:/app:rw
+            - ~/.composer:/home/user/.composer
+        ports:
+            - "0.0.0.0:82:8000"
+        networks:
+            - services
+        command: /bin/bash -c "symfony server:stop && symfony server:start --no-tls"
+        logging:
+            options:
+                max-size: "100k"
+                max-file: "3"
+#    postgres:
+#        build: ./postgres
+#        restart: unless-stopped
+#        volumes:
+#            - ${POSTGRES_DATA_DIR}:/var/lib/postgresql/data
+#        ports:
+#            - "0.0.0.0:5432:5432"
+#        networks:
+#            - produman
+#        command: postgres -c timezone=Europe/Moscow
+#        environment:
+#            TZ: UTC
+#            POSTGRES_PASSWORD: produman
+#            POSTGRES_HOST_AUTH_METHOD: password
+#            POSTGRES_INITDB_ARGS: --auth-host=password
+#        logging:
+#            options:
+#                max-size: "100k"
+#                max-file: "3"
+networks:
+    produman:
+        driver: bridge
+        name: services
